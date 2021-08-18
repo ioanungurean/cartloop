@@ -3,7 +3,7 @@ import { io } from "socket.io-client";
 let socket;
 
 export const connect = () => {
-  socket = io("localhost:3000");
+  socket = io(process.env.API_ENDPOINT);
   console.log(`Connecting...`);
 };
 
