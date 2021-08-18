@@ -15,9 +15,14 @@ io.on("connection", (socket) => {
   if (users.length === 2) {
     mappings[users[0]] = users[1];
     mappings[users[1]] = users[0];
+
+    socket.emit("login", mappings[socket.id]);
+    socket.to(mappings[socket.id]).emit("login", socket.id);
   }
 
   socket.on("disconnect", () => {
+    socket.to(mappings[socket.id]).emit("logout");
+
     users.splice(users.indexOf(socket.id), 1);
 
     console.log("user disconnected");

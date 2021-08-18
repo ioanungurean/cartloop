@@ -12,6 +12,20 @@ export const disconnect = () => {
   if (socket) socket.disconnect();
 };
 
+export const login = (cb) => {
+  socket.on("login", (userId) => {
+    return cb(null, userId);
+  });
+  console.log("Login...");
+};
+
+export const logout = (cb) => {
+  socket.on("logout", () => {
+    return cb();
+  });
+  console.log("Logout...");
+};
+
 export const subscribe = (cb) => {
   socket.on("message", (msg) => {
     return cb(null, msg);

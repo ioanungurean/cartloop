@@ -1,21 +1,31 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
-import { connect, disconnect, subscribe } from "../socket";
+import { connect, disconnect, login, logout, subscribe } from "../socket";
 
 import Input from "../components/Input";
 import {
   StyledMessenger,
   StyledHeader,
+  StyledCircle,
   StyledChatHistory,
   StyledMessage,
   StyledInput,
 } from "./Messenger.style";
 
 const Messenger = () => {
+  const [userId, setUserId] = useState("No User Connected");
   const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     connect();
+
+    login((err, userId) => {
+      setUserId(userId);
+    });
+
+    logout(() => {
+      setUserId("No User Connected");
+    });
 
     subscribe((err, { message }) => {
       setMessages((prevMessages) => [
@@ -29,6 +39,13 @@ const Messenger = () => {
     };
   }, []);
 
+  useEffect(() => {
+    const lastMessage = document.getElementById(`${messages.length - 1}`);
+    if (lastMessage) {
+      lastMessage.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
+
   const onSendMessage = (message) => {
     setMessages((prevMessages) => [
       ...prevMessages,
@@ -38,10 +55,13 @@ const Messenger = () => {
 
   return (
     <StyledMessenger>
-      <StyledHeader>Ion Popescu</StyledHeader>
+      <StyledHeader>
+        <StyledCircle connected={userId !== "No User Connected"} />
+        {userId}
+      </StyledHeader>
       <StyledChatHistory>
         {messages.map(({ id, fromMe, message }) => (
-          <StyledMessage key={id} fromMe={fromMe}>
+          <StyledMessage key={id} id={id} fromMe={fromMe}>
             {message}
           </StyledMessage>
         ))}
